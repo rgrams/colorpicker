@@ -1,0 +1,162 @@
+
+local rendercam = require "rendercam.rendercam"
+local util = require "main.framework.utilities"
+local color = require "main.colorpicker.color"
+
+local min_decimal_places = 0
+local min_dec_str = "%." .. min_decimal_places .. "f" -- will need to update these when the numbers are changed
+local max_decimal_places = 2
+local max_dec_str = "%." .. max_decimal_places .. "f" -- will need to update these when the numbers are changed
+local max_dec_mult = 10^max_decimal_places
+local use_alpha = true
+
+local SPRITE_SIZE = vmath.vector3(64, 64, 0)
+local MODE_VALS = { hsv = 0, rgb = 1 }
+local AXIS_VALS = { x = 1, y = 2, z = 3, w = 4 }
+
+local selectors = {}
+
+
+local function add_selector(name, spriteSize, useAxisX, useAxisY, mode, changing, colAxisX, colAxisY)
+	local id = go.get_id(name)
+	local handle = go.get_id(name .. " handle")
+	local sprite = go.get_id(name .. " sprite")
+	local pos = go.get_world_position(id)
+	local scale = go.get_world_scale(sprite)
+	local s = vmath.vector3(spriteSize.x * scale.x, spriteSize.y * scale.y, 1)
+	local settings = vmath.vector4(useAxisX and AXIS_VALS[colAxisX] or 0, useAxisY and AXIS_VALS[colAxisY] or 0, changing and 1 or 0, MODE_VALS[mode])
+	go.set(name .. " sprite#sprite", "settings", settings)
+	selectors[id] = {
+		handle = handle,
+		pos = pos,
+		boundMax = pos + s * 0.5,
+		boundMin = pos - s * 0.5,
+		size = s,
+		axes = { x = useAxisX and 1 or 0, y = useAxisY and 1 or 0 },
+		mode = mode,
+		colorAxes = { x = colAxisX, y = colAxisY }
+	}
+end
+
+local function format_float(f)
+	s = tostring(util.round(f * max_dec_mult)/max_dec_mult)
+	local l = string.len(s)
+	if l < min_decimal_places + 2 then
+		s = string.format(min_dec_str, f)
+	elseif l > max_decimal_places + 2 then
+		s = string.format(max_dec_str, f)
+	end
+	return s
+end
+
+local function update_label(color, old)
+	local str
+	if use_alpha then
+		str = string.format("(%s, %s, %s, %s)", format_float(color.x), format_float(color.y), format_float(color.z), format_float(color.w))
+	else
+		str = string.format("(%s, %s, %s)", format_float(color.x), format_float(color.y), format_float(color.z))
+	end
+	if old then
+		label.set_text("color swatches#label old", str)
+	else
+		label.set_text("color swatches#label new", str)
+	end
+	return str
+end
+
+local function clamp_vec_bounds(vec, boundMin, boundMax)
+	return vmath.vector3(util.clamp(vec.x, boundMin.x, boundMax.x), util.clamp(vec.y, boundMin.y, boundMax.y), vec.z)
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	self.mouse_spos = vmath.vector3()
+	self.mouse_wpos = vmath.vector3()
+	self.clickIsPressed = false
+	self.isOverSelector = false -- selector id, if the cursor is currently over a selector
+	self.selector = false -- the currently used selector
+
+	self.curColor = { hsv = vmath.vector4(1), rgb = vmath.vector4(1) }
+	self.oldColor = vmath.vector4(1)
+	update_label(self.curColor.rgb, false)
+	update_label(self.oldColor, true)
+
+	add_selector("main box", SPRITE_SIZE, true, true, "hsv", true, "y", "z")
+	add_selector("hue slider", SPRITE_SIZE, false, true, "hsv", false, "y", "x")
+	add_selector("opacity slider", SPRITE_SIZE, true, false, "rgb", false, "w", "x")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("trigger_response") then
+		if message.enter then
+			self.isOverSelector = message.other_id
+			if not self.selector then
+				self.selector = selectors[message.other_id]
+				if not self.selector then
+					print("WARNING - hovered object: " .. self.isOverSelector .. " that is not a registered selector")
+				end
+			end
+		else
+			self.isOverSelector = false
+			if not self.clickIsPressed then self.selector = false end
+		end
+	end
+end
+
+function update(self, dt)
+	if self.selector and self.clickIsPressed then
+		local cursorPos = go.get_world_position("cursor")
+		cursorPos = clamp_vec_bounds(cursorPos, self.selector.boundMin, self.selector.boundMax)
+		local pos = cursorPos - self.selector.pos -- offset/local pos to selector
+		go.set_position(pos, self.selector.handle)
+		 -- remap pos to 0-1 within the selector
+		pos.x = pos.x / self.selector.size.x + 0.5;  pos.y = pos.y / self.selector.size.y + 0.5
+
+		-- make shortcuts to the color that will be changed
+		local c = self.curColor[self.selector.mode]
+		-- Modify the appropriate axes - lerp based on selector.axes values (0 or 1)
+		c[self.selector.colorAxes.x] = vmath.lerp(self.selector.axes.x, c[self.selector.colorAxes.x], pos.x)
+		c[self.selector.colorAxes.y] = vmath.lerp(self.selector.axes.y, c[self.selector.colorAxes.y], pos.y)
+		-- Update the unchanged color based on the changed one
+		if self.selector.mode == "hsv" then
+			self.curColor.rgb = color.hsva_to_rgba(self.curColor.hsv)
+		else
+			self.curColor.hsv = color.rgba_to_hsva(self.curColor.rgb)
+		end
+		--self.curColor.hsv = color.rgba_to_hsva(color.hsva_to_rgba(self.curColor.hsv))
+
+		go.set("color swatches#new", "tint", self.curColor.rgb)
+		msg.post("@render:", "update color", self.curColor)
+		update_label(self.curColor.rgb)
+	end
+end
+
+function on_input(self, action_id, action)
+	if not action_id then
+		self.mouse_spos.x = action.screen_x;  self.mouse_spos.y = action.screen_y
+		self.mouse_wpos = rendercam.screen_to_world_2d(action.screen_x, action.screen_y)
+		go.set_position(self.mouse_wpos, "cursor") -- has cursor collision object
+
+	elseif action.pressed then
+		if action_id == hash("left click") then  -- CLICK PRESSED
+			self.clickIsPressed = true
+		end
+
+	elseif action.released then
+		if action_id == hash("left click") then -- CLICK RELEASED
+			self.clickIsPressed = false
+			if self.selector then
+				self.oldColor = vmath.vector4(self.curColor.rgb) -- set oldColor to curColor
+				go.set("color swatches#old", "tint", self.oldColor) -- update color of 'old' swatch
+				local txt = update_label(self.oldColor, true) -- update 'old' swatch label text, and store it
+
+				clipboard.copy(txt) -- immediately copy the updated color's text to the clipboard
+
+				self.selector = selectors[self.isOverSelector] -- update self.selector to currently hovered selector (nil or hash id)
+				if self.isOverSelector and not self.selector then
+					print("WARNING - hovered object: " .. self.isOverSelector .. " that is not a registered selector")
+				end
+			end
+		end
+	end
+end

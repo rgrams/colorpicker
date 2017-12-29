@@ -1,0 +1,18 @@
+[project]
+title = My project
+version = 0.1
+dependencies = https://github.com/rgrams/rendercam/archive/master.zip,https://github.com/britzl/defold-clipboard/archive/master.zip
+
+[bootstrap]
+main_collection = /main/main.collectionc
+render = /main/render/custom rendercam.renderc
+
+[physics]
+scale = 0.02
+
+[script]
+shared_state = 1
+
+[input]
+game_binding = /input/game.input_bindingc
+
