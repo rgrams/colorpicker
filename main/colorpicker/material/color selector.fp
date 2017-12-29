@@ -63,8 +63,8 @@ void main()
 {
 	vec4 color = vec4(1.0);
 	// to start, set our color to the current color for our mode (hsv or rgb)
-	if (settings.b == 1) {
-		if (settings.a == 0) { color.rgba = color_hsv; }
+	if (settings.z == 1) {
+		if (settings.w == 0) { color.rgba = color_hsv; }
 		else { color.rgba = color_rgb; }
 	}
 
@@ -81,7 +81,7 @@ void main()
 	else if (settings.y == 4) { color.a = var_texcoord0.y; }
 
 	// If not using rgb mode, convert color from hsv to rgb
-	if (settings.a == 0) { color.rgb = hsv2rgb(color.rgb); }
+	if (settings.w == 0) { color.rgb = hsv2rgb(color.rgb); }
 	color.rgb *= color.a; // Pre-multiply
 
 	gl_FragColor = color;
