@@ -24,7 +24,7 @@ collection_instances {
   collection: "/main/colorpicker/colorpicker.collection"
   position {
     x: 0.0
-    y: 0.0
+    y: -60.0
     z: 0.0
   }
   rotation {

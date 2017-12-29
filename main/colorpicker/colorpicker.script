@@ -83,7 +83,10 @@ function init(self)
 
 	add_selector("main box", SPRITE_SIZE, true, true, "hsv", true, "y", "z")
 	add_selector("hue slider", SPRITE_SIZE, false, true, "hsv", false, "y", "x")
-	add_selector("opacity slider", SPRITE_SIZE, true, false, "rgb", false, "w", "x")
+	add_selector("opacity slider", SPRITE_SIZE, true, false, "rgb", true, "w", "x")
+	add_selector("red slider", SPRITE_SIZE, true, false, "rgb", true, "x", "x")
+	add_selector("green slider", SPRITE_SIZE, true, false, "rgb", true, "y", "x")
+	add_selector("blue slider", SPRITE_SIZE, true, false, "rgb", true, "z", "x")
 end
 
 function on_message(self, message_id, message, sender)

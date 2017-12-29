@@ -7,19 +7,21 @@ local util = require "main.framework.utilities"
 
 function M.rgba_to_hsva(rgb)
 	local hsv = vmath.vector4(rgb)
-	local mx = math.max(rgb.x, rgb.y, rgb.z)
-	local mn = math.min(rgb.x, rgb.y, rgb.z)
-	local diff = mx - mn
+	local mx = math.max(rgb.x, rgb.y, rgb.z) -- max of r, g, b
+	local mn = math.min(rgb.x, rgb.y, rgb.z) -- min of r, g, b
+	local diff = mx - mn -- diff between min and max
 	-- Hue
+	-- hue is calculated in three arcs depending on which rgb is the highest
 	if mx == mn then
 		hsv.x = 0
 	elseif mx == rgb.x then
-		hsv.x = (60 * ((rgb.y-rgb.z)/diff) + 360) % 360
+		hsv.x = (rgb.y-rgb.z)/diff
 	elseif mx == rgb.y then
-		hsv.x = (60 * ((rgb.z-rgb.x)/diff) + 360) % 360
+		hsv.x = 2 + (rgb.z-rgb.x)/diff
 	elseif mx == rgb.z then
-		hsv.x = (60 * ((rgb.x-rgb.y)/diff) + 360) % 360
+		hsv.x = 4 + (rgb.x-rgb.y)/diff
 	end
+	hsv.x = (hsv.x/6)%1
 	-- Saturation
 	if mx == 0 then
 		hsv.y = 0
