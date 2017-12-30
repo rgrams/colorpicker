@@ -24,18 +24,21 @@ local function add_selector(name, spriteSize, useAxisX, useAxisY, mode, changing
 	local pos = go.get_world_position(id)
 	local scale = go.get_world_scale(sprite)
 	local s = vmath.vector3(spriteSize.x * scale.x, spriteSize.y * scale.y, 1)
-	local settings = vmath.vector4(useAxisX and AXIS_VALS[colAxisX] or 0, useAxisY and AXIS_VALS[colAxisY] or 0, changing and 1 or 0, MODE_VALS[mode])
+	useAxisX = useAxisX and 1 or 0;  useAxisY = useAxisY and 1 or 0
+	local settings = vmath.vector4(useAxisX * AXIS_VALS[colAxisX], useAxisY * AXIS_VALS[colAxisY], changing and 1 or 0, MODE_VALS[mode])
 	go.set(name .. " sprite#sprite", "settings", settings)
-	selectors[id] = {
+	local boundV = vmath.vector3(s.x * useAxisX, s.y * useAxisY, 0)
+	local data = {
 		handle = handle,
 		pos = pos,
-		boundMax = pos + s * 0.5,
-		boundMin = pos - s * 0.5,
+		boundMax = pos + boundV * 0.5,
+		boundMin = pos - boundV * 0.5,
 		size = s,
-		axes = { x = useAxisX and 1 or 0, y = useAxisY and 1 or 0 },
+		axes = { x = useAxisX, y = useAxisY },
 		mode = mode,
 		colorAxes = { x = colAxisX, y = colAxisY }
 	}
+	selectors[id] = data
 end
 
 local function format_float(f)
@@ -68,6 +71,16 @@ local function clamp_vec_bounds(vec, boundMin, boundMax)
 	return vmath.vector3(util.clamp(vec.x, boundMin.x, boundMax.x), util.clamp(vec.y, boundMin.y, boundMax.y), vec.z)
 end
 
+local function color_to_pos(self, selector)
+	local color = self.curColor[selector.mode]
+	local pos = vmath.vector3(0)
+	pos.x = selector.axes.x == 1 and color[selector.colorAxes.x] or 0.5
+	pos.y = selector.axes.y == 1 and color[selector.colorAxes.y] or 0.5
+	pos.x = (pos.x - 0.5) * selector.size.x
+	pos.y = (pos.y - 0.5) * selector.size.y
+	return pos
+end
+
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	self.mouse_spos = vmath.vector3()
@@ -76,7 +89,7 @@ function init(self)
 	self.isOverSelector = false -- selector id, if the cursor is currently over a selector
 	self.selector = false -- the currently used selector
 
-	self.curColor = { hsv = vmath.vector4(1), rgb = vmath.vector4(1) }
+	self.curColor = { hsv = color.rgba_to_hsva(vmath.vector4(1)), rgb = vmath.vector4(1) }
 	self.oldColor = vmath.vector4(1)
 	update_label(self.curColor.rgb, false)
 	update_label(self.oldColor, true)
@@ -87,6 +100,10 @@ function init(self)
 	add_selector("red slider", SPRITE_SIZE, true, false, "rgb", true, "x", "x")
 	add_selector("green slider", SPRITE_SIZE, true, false, "rgb", true, "y", "x")
 	add_selector("blue slider", SPRITE_SIZE, true, false, "rgb", true, "z", "x")
+
+	for id, selector in pairs(selectors) do
+		go.set_position(color_to_pos(self, selector), selector.handle)
+	end
 end
 
 function on_message(self, message_id, message, sender)
@@ -127,6 +144,13 @@ function update(self, dt)
 			self.curColor.rgb = color.hsva_to_rgba(self.curColor.hsv)
 		else
 			self.curColor.hsv = color.rgba_to_hsva(self.curColor.rgb)
+		end
+
+		-- Update handle positions of all other selectors based on the new colors
+		for id, selector in pairs(selectors) do
+			if selector ~= self.selector then
+				go.set_position(color_to_pos(self, selector), selector.handle)
+			end
 		end
 
 		go.set("color swatches#new", "tint", self.curColor.rgb)
