@@ -93,15 +93,17 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("trigger_response") then
 		if message.enter then
 			self.isOverSelector = message.other_id
-			if not self.selector then
+			if not self.clickIsPressed then
 				self.selector = selectors[message.other_id]
 				if not self.selector then
 					print("WARNING - hovered object: " .. self.isOverSelector .. " that is not a registered selector")
 				end
 			end
-		else
-			self.isOverSelector = false
-			if not self.clickIsPressed then self.selector = false end
+		else -- trigger exit
+			if self.isOverSelector == message.other_id then
+				self.isOverSelector = false
+				if not self.clickIsPressed then self.selector = false end
+			end
 		end
 	end
 end
@@ -115,7 +117,7 @@ function update(self, dt)
 		 -- remap pos to 0-1 within the selector
 		pos.x = pos.x / self.selector.size.x + 0.5;  pos.y = pos.y / self.selector.size.y + 0.5
 
-		-- make shortcuts to the color that will be changed
+		-- make shortcut to the color that will be changed
 		local c = self.curColor[self.selector.mode]
 		-- Modify the appropriate axes - lerp based on selector.axes values (0 or 1)
 		c[self.selector.colorAxes.x] = vmath.lerp(self.selector.axes.x, c[self.selector.colorAxes.x], pos.x)
@@ -126,7 +128,6 @@ function update(self, dt)
 		else
 			self.curColor.hsv = color.rgba_to_hsva(self.curColor.rgb)
 		end
-		--self.curColor.hsv = color.rgba_to_hsva(color.hsva_to_rgba(self.curColor.hsv))
 
 		go.set("color swatches#new", "tint", self.curColor.rgb)
 		msg.post("@render:", "update color", self.curColor)
@@ -154,11 +155,10 @@ function on_input(self, action_id, action)
 				local txt = update_label(self.oldColor, true) -- update 'old' swatch label text, and store it
 
 				clipboard.copy(txt) -- immediately copy the updated color's text to the clipboard
-
-				self.selector = selectors[self.isOverSelector] -- update self.selector to currently hovered selector (nil or hash id)
-				if self.isOverSelector and not self.selector then
-					print("WARNING - hovered object: " .. self.isOverSelector .. " that is not a registered selector")
-				end
+			end
+			self.selector = selectors[self.isOverSelector] -- update self.selector to currently hovered selector (nil or hash id)
+			if self.isOverSelector and not self.selector then
+				print("WARNING - hovered object: " .. self.isOverSelector .. " that is not a registered selector")
 			end
 		end
 	end
