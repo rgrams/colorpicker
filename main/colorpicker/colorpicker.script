@@ -18,15 +18,15 @@ local selectors = {}
 
 
 local function add_selector(name, spriteSize, useAxisX, useAxisY, mode, changing, colAxisX, colAxisY)
-	local id = go.get_id(name)
-	local handle = go.get_id(name .. " handle")
-	local sprite = go.get_id(name .. " sprite")
+	local id = go.get_id(name .. "/root")
+	local handle = go.get_id(name .. "/handle")
+	local sprite = go.get_id(name .. "/sprite")
 	local pos = go.get_world_position(id)
 	local scale = go.get_world_scale(sprite)
 	local s = vmath.vector3(spriteSize.x * scale.x, spriteSize.y * scale.y, 1)
 	useAxisX = useAxisX and 1 or 0;  useAxisY = useAxisY and 1 or 0
 	local settings = vmath.vector4(useAxisX * AXIS_VALS[colAxisX], useAxisY * AXIS_VALS[colAxisY], changing and 1 or 0, MODE_VALS[mode])
-	go.set(name .. " sprite#sprite", "settings", settings)
+	go.set(name .. "/sprite#sprite", "settings", settings)
 	local boundV = vmath.vector3(s.x * useAxisX, s.y * useAxisY, 0)
 	local data = {
 		handle = handle,
