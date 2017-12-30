@@ -1,6 +1,6 @@
 [project]
-title = My project
-version = 0.1
+title = Colorpicker
+version = 0.8
 dependencies = https://github.com/rgrams/rendercam/archive/master.zip,https://github.com/britzl/defold-clipboard/archive/master.zip
 
 [bootstrap]
@@ -15,4 +15,42 @@ shared_state = 1
 
 [input]
 game_binding = /input/game.input_bindingc
+use_accelerometer = 0
+
+[sprite]
+max_count = 64
+
+[spine]
+max_count = 0
+
+[gui]
+max_count = 8
+
+[particle_fx]
+max_count = 0
+max_particle_count = 0
+
+[collection_proxy]
+max_count = 2
+
+[collectionfactory]
+max_count = 8
+
+[factory]
+max_count = 8
+
+[sound]
+max_sound_data = 0
+max_sound_buffers = 0
+max_sound_sources = 0
+max_sound_instances = 0
+
+[collection]
+max_instances = 64
+
+[resource]
+max_resources = 64
+
+[graphics]
+max_draw_calls = 32
 
