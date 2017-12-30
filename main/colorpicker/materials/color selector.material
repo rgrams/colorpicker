@@ -1,7 +1,7 @@
 name: "color selector"
 tags: "tile"
-vertex_program: "/main/colorpicker/material/color selector.vp"
-fragment_program: "/main/colorpicker/material/color selector.fp"
+vertex_program: "/main/colorpicker/materials/color selector.vp"
+fragment_program: "/main/colorpicker/materials/color selector.fp"
 vertex_constants {
   name: "view_proj"
   type: CONSTANT_TYPE_VIEWPROJ
