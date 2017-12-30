@@ -1,0 +1,44 @@
+name: "selector handle"
+tags: "tile"
+vertex_program: "/main/colorpicker/material/color selector.vp"
+fragment_program: "/main/colorpicker/material/handle.fp"
+vertex_constants {
+  name: "view_proj"
+  type: CONSTANT_TYPE_VIEWPROJ
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+fragment_constants {
+  name: "settings"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 2.0
+    y: 3.0
+    z: 0.0
+    w: 0.0
+  }
+}
+fragment_constants {
+  name: "color_rgb"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+}
+fragment_constants {
+  name: "color_hsv"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+}

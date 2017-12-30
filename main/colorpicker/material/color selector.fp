@@ -5,16 +5,17 @@ uniform lowp vec4 settings;
 uniform lowp vec4 color_rgb;
 uniform lowp vec4 color_hsv;
 
-vec3 rgb_to_hsv(vec3 rgb) {
+vec3 rgb_to_hsv(vec3 rgb) { // not actually used
 	vec3 hsv = vec3(0.0, 0.0, 0.0);
 	float mx = max(max(rgb.x, rgb.y), rgb.z);
 	float mn = min(min(rgb.x, rgb.y), rgb.z);
 	float diff = mx-mn;
 	// Hue
 	if(mx == mn) { hsv.x = 0; }
-	else if(mx == rgb.x) { hsv.x = mod((60 * ((rgb.y-rgb.z)/diff) + 360), 360); }
-	else if(mx == rgb.y) { hsv.x = mod((60 * ((rgb.z-rgb.x)/diff) + 360), 360); }
-	else if(mx == rgb.z) { hsv.x = mod((60 * ((rgb.x-rgb.y)/diff) + 360), 360); }
+	else if(mx == rgb.x) { hsv.x = (rgb.y-rgb.z)/diff; }
+	else if(mx == rgb.y) { hsv.x = 2 + (rgb.z-rgb.x)/diff; }
+	else if(mx == rgb.z) { hsv.x = 4 + (rgb.x-rgb.y)/diff; }
+	hsv.x = mod(hsv.x/6, 1);
 	// Saturation
 	if(mx == 0) { hsv.y = 0; }
 	else { hsv.y = diff/mx; }
@@ -24,23 +25,7 @@ vec3 rgb_to_hsv(vec3 rgb) {
 	return hsv;
 }
 
-vec3 hsv_to_rgb(vec3 hsv) { // doesn't work
-	vec3 rgb = vec3(hsv);
-	float hi = floor(hsv.x*6);
-	float f = hsv.x*6 - hi;
-    float p = hsv.z * (1.0 - hsv.y);
-    float q = hsv.z * (1.0 - f * hsv.y);
-    float t = hsv.z * (1.0 - (1.0 - f) * hsv.y);
-    if(hi == 0) { rgb.x, rgb.y, rgb.z = hsv.z, t, p; }
-    else if(hi == 1) { rgb.x, rgb.y, rgb.z = q, hsv.z, p; }
-    else if(hi == 2) { rgb.x, rgb.y, rgb.z = p, hsv.z, t; }
-    else if(hi == 3) { rgb.x, rgb.y, rgb.z = p, q, hsv.z; }
-    else if(hi == 4) { rgb.x, rgb.y, rgb.z = t, p, hsv.z; }
-    else if(hi == 5) { rgb.x, rgb.y, rgb.z = hsv.z, p, q; }
-    return rgb;
-}
-
-vec3 hsv2rgb(vec3 c) { // works
+vec3 hsv2rgb(vec3 c) {
   vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
   vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
   return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
