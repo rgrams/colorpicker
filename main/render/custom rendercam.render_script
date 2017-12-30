@@ -1,6 +1,6 @@
 
 local rendercam = require "rendercam.rendercam"
-local color = require "main.colorpicker.color"
+local color = require "main.framework.color"
 local vp = rendercam.viewport
 
 local IDENTITY_MATRIX = vmath.matrix4()

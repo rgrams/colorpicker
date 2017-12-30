@@ -1,7 +1,7 @@
 
 local rendercam = require "rendercam.rendercam"
 local util = require "main.framework.utilities"
-local color = require "main.colorpicker.color"
+local color = require "main.framework.color"
 
 local min_decimal_places = 0
 local min_dec_str = "%." .. min_decimal_places .. "f" -- will need to update these when the numbers are changed
