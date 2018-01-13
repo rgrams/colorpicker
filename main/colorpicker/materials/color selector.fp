@@ -11,13 +11,13 @@ vec3 rgb_to_hsv(vec3 rgb) { // not actually used
 	float mn = min(min(rgb.x, rgb.y), rgb.z);
 	float diff = mx-mn;
 	// Hue
-	if(mx == mn) { hsv.x = 0; }
+	if(mx == mn) { hsv.x = 0.0; }
 	else if(mx == rgb.x) { hsv.x = (rgb.y-rgb.z)/diff; }
-	else if(mx == rgb.y) { hsv.x = 2 + (rgb.z-rgb.x)/diff; }
-	else if(mx == rgb.z) { hsv.x = 4 + (rgb.x-rgb.y)/diff; }
-	hsv.x = mod(hsv.x/6, 1);
+	else if(mx == rgb.y) { hsv.x = 2.0 + (rgb.z-rgb.x)/diff; }
+	else if(mx == rgb.z) { hsv.x = 4.0 + (rgb.x-rgb.y)/diff; }
+	hsv.x = mod(hsv.x/6.0, 1.0);
 	// Saturation
-	if(mx == 0) { hsv.y = 0; }
+	if(mx == 0.0) { hsv.y = 0.0; }
 	else { hsv.y = diff/mx; }
 	// Value
 	hsv.z = mx;
@@ -48,25 +48,25 @@ void main()
 {
 	vec4 color = vec4(1.0);
 	// to start, set our color to the current color for our mode (hsv or rgb)
-	if (settings.z == 1) {
-		if (settings.w == 0) { color.rgba = color_hsv; }
+	if (settings.z == 1.0) {
+		if (settings.w == 0.0) { color.rgba = color_hsv; }
 		else { color.rgba = color_rgb; }
 	}
 
 	// change values of selected axes
 	// x-axis
-	if (settings.x == 1) { color.r = var_texcoord0.x; }
-	else if (settings.x == 2) { color.g = var_texcoord0.x; }
-	else if (settings.x == 3) { color.b = var_texcoord0.x; }
-	else if (settings.x == 4) { color.a = var_texcoord0.x; }
+	if (settings.x == 1.0) { color.r = var_texcoord0.x; }
+	else if (settings.x == 2.0) { color.g = var_texcoord0.x; }
+	else if (settings.x == 3.0) { color.b = var_texcoord0.x; }
+	else if (settings.x == 4.0) { color.a = var_texcoord0.x; }
 	// y-axis
-	if (settings.y == 1) { color.r = var_texcoord0.y; }
-	else if (settings.y == 2) { color.g = var_texcoord0.y; }
-	else if (settings.y == 3) { color.b = var_texcoord0.y; }
-	else if (settings.y == 4) { color.a = var_texcoord0.y; }
+	if (settings.y == 1.0) { color.r = var_texcoord0.y; }
+	else if (settings.y == 2.0) { color.g = var_texcoord0.y; }
+	else if (settings.y == 3.0) { color.b = var_texcoord0.y; }
+	else if (settings.y == 4.0) { color.a = var_texcoord0.y; }
 
 	// If not using rgb mode, convert color from hsv to rgb
-	if (settings.w == 0) { color.rgb = hsv2rgb(color.rgb); }
+	if (settings.w == 0.0) { color.rgb = hsv2rgb(color.rgb); }
 	color.rgb *= color.a; // Pre-multiply
 
 	gl_FragColor = color;

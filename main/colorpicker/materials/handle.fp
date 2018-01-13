@@ -20,7 +20,7 @@ void main()
 	vec4 tex = texture2D(DIFFUSE_TEXTURE, var_texcoord0.xy);
 	float texval = min(1.0, tex.r + tex.g + tex.b); // crude value of tex
 	// invert hsv color, clamp value, and premultiply
-	vec4 inv = vec4(mod(color_hsv.x+0.5, 1), color_hsv.y, min(1.0-rgb_to_val(color_rgb.rgb), 0.4), 1.0) * tex.a;
+	vec4 inv = vec4(mod(color_hsv.x+0.5, 1.0), color_hsv.y, min(1.0-rgb_to_val(color_rgb.rgb), 0.4), 1.0) * tex.a;
 	inv.rgb = hsv_to_rgb(inv.rgb); // convert back to rgb
 
 	gl_FragColor = mix(tex, inv, 1.0-texval);
