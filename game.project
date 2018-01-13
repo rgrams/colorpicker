@@ -17,3 +17,6 @@ shared_state = 1
 game_binding = /input/game.input_bindingc
 use_accelerometer = 0
 
+[html5]
+htmlfile = /html/colorpicker_index.html
+

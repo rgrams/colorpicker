@@ -178,7 +178,11 @@ function on_input(self, action_id, action)
 				go.set("color swatches#old", "tint", self.oldColor) -- update color of 'old' swatch
 				local txt = update_label(self.oldColor, true) -- update 'old' swatch label text, and store it
 
-				clipboard.copy(txt) -- immediately copy the updated color's text to the clipboard
+				if clipboard then
+					clipboard.copy(txt) -- immediately copy the updated color's text to the clipboard
+				elseif html5 then
+					html5.run("set_clipboard_text('" .. txt .. "')")
+				end
 			end
 			self.selector = selectors[self.isOverSelector] -- update self.selector to currently hovered selector (nil or hash id)
 			if self.isOverSelector and not self.selector then
