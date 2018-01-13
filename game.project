@@ -1,6 +1,6 @@
 [project]
 title = Colorpicker
-version = 0.8
+version = 0.9
 dependencies = https://github.com/rgrams/rendercam/archive/master.zip
 
 [bootstrap]
