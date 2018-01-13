@@ -1,7 +1,7 @@
 [project]
 title = Colorpicker
 version = 0.8
-dependencies = https://github.com/rgrams/rendercam/archive/master.zip,https://github.com/britzl/defold-clipboard/archive/master.zip
+dependencies = https://github.com/rgrams/rendercam/archive/master.zip
 
 [bootstrap]
 main_collection = /main/main.collectionc
