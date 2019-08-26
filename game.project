@@ -24,3 +24,6 @@ htmlfile = /html/colorpicker_index.html
 width = 750
 height = 630
 
+[windows]
+app_icon = /colorpicker_icon.ico
+
