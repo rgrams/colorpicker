@@ -20,3 +20,7 @@ use_accelerometer = 0
 [html5]
 htmlfile = /html/colorpicker_index.html
 
+[display]
+width = 750
+height = 630
+

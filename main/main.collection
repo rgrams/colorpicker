@@ -3,7 +3,7 @@ instances {
   id: "camera"
   prototype: "/rendercam/camera.go"
   position {
-    x: 0.0
+    x: 30.0
     y: 0.0
     z: 0.0
   }
@@ -12,6 +12,29 @@ instances {
     y: 0.0
     z: 0.0
     w: 1.0
+  }
+  component_properties {
+    id: "script"
+    properties {
+      id: "fixedAspectRatio"
+      value: "true"
+      type: PROPERTY_TYPE_BOOLEAN
+    }
+    properties {
+      id: "aspectRatio"
+      value: "750.0, 630.0, 0.0"
+      type: PROPERTY_TYPE_VECTOR3
+    }
+    properties {
+      id: "useViewArea"
+      value: "true"
+      type: PROPERTY_TYPE_BOOLEAN
+    }
+    properties {
+      id: "viewArea"
+      value: "750.0, 630.0, 0.0"
+      type: PROPERTY_TYPE_VECTOR3
+    }
   }
   scale3 {
     x: 1.0
@@ -61,6 +84,26 @@ embedded_instances {
   position {
     x: 0.0
     y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "go"
+  data: ""
+  position {
+    x: 406.0
+    y: 39.0
     z: 0.0
   }
   rotation {
